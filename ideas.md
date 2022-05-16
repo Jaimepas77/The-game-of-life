@@ -12,7 +12,7 @@ Having stated the general porpuse of this project, any other idea (mainly more s
 
 ## Abstract ideas
 
-- idea1
+- Doing an UML diagram for general planning
 - idea3
 
 ## Implementation ideas
