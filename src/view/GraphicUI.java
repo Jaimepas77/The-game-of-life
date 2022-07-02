@@ -5,6 +5,7 @@ import java.awt.Dimension;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JToolBar;
 
 import model.Game;
 import view.GUIresources.*;
@@ -26,15 +27,19 @@ public class GraphicUI extends JFrame implements Viewer{
 
 		//Layout settings
 		this.setLayout(new BorderLayout());
+		
+		//Toolbar (NORTH)
+		JToolBar tools = new ToolBar(game);
+		this.add(tools, BorderLayout.NORTH);
 
 		//Board (CENTER)
 		JPanel board = new BoardGrid(game);
 		this.add(board, BorderLayout.CENTER);
 
 		//Adapt the window appearance
-		this.setBounds(200, 50, 900, 600);//Size and position if not maximized
+		this.setBounds(200, 50, 900, 600);//Default size and position if not maximised
 		this.setMinimumSize(new Dimension(550, 400));//Minimum size
-		//this.setExtendedState(JFrame.NORMAL);//Start the window maximized
+		//this.setExtendedState(JFrame.NORMAL);
 		this.setVisible(true);
 	}
 }

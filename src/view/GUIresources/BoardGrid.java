@@ -16,7 +16,7 @@ public class BoardGrid extends JPanel implements GameObserver {
 	private static final long serialVersionUID = 1L;
 	
 	private Game game;
-	private JButton[][] boardBoxes;//Casillas (cajas)
+	private JButton[][] boardBoxes;//Boxes of the board
 	private int numRows;
 	private int numCols;
 
@@ -37,38 +37,43 @@ public class BoardGrid extends JPanel implements GameObserver {
 
 		for(int i = 0; i < numRows; i++) {
 			for(int j = 0; j < numCols; j++) {
-				//Inicializar propiedades del botón
+				//Initialising button properties
 				boardBoxes[i][j] = new JButton();
 				boardBoxes[i][j].setBackground(Color.WHITE);
 				boardBoxes[i][j].setBorderPainted(true);
 
-				//Configurar acciones del botón
-				int x = i;//Coordenadas definitivas del botón
+				//button actions configuration
+				int x = i;//A separate variable to preserve the final coordinates for the button
 				int y = j;
 				boardBoxes[i][j].addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						game.setSquareState(!game.getSquareState(x, y), x, y);//Invertir estado
+						game.setSquareState(!game.getSquareState(x, y), x, y);//Invert squares state
 					}
 				}
 				);
 				
-				//Añadir el botón al panel
+				//Adding the button to the panel
 				this.add(boardBoxes[i][j]);
 			}
 		}
 	}
 	
+	@Override
 	public void onBoardUpdate() {
 		
 		boolean[][] board = game.getBoard();
 		for(int i = 0; i < numRows; i++) {
 			for(int j = 0; j < numCols; j++) {
 				if(board[i][j]) {
-					boardBoxes[i][j].setBackground(Color.YELLOW);
+					if(boardBoxes[i][j].getBackground() != Color.YELLOW) {
+						boardBoxes[i][j].setBackground(Color.YELLOW);
+					}
 				}
 				else {
-					boardBoxes[i][j].setBackground(Color.WHITE);
+					if(boardBoxes[i][j].getBackground() != Color.WHITE) {//Only act if it is necessary (to prevent lag)
+						boardBoxes[i][j].setBackground(Color.WHITE);
+					}
 				}
 			}
 		}

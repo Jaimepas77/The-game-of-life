@@ -14,6 +14,9 @@ public class Game {
 	//Observers (observer pattern)
 	ArrayList<GameObserver> observers = new ArrayList<GameObserver>();
 
+	private boolean running = false; //Whether the game is running or not
+	private long delta = 1000;//The delay between steps in the running process
+
 	public Game(int rows, int columns)
 	{
 		this.rows = rows;
@@ -60,6 +63,34 @@ public class Game {
 		
 		updateBoard();
 	}
+	
+	public void play() { //Run steps of the game. It can be stopped with the stop method
+		if(!running) {
+			running = true;
+			updateRunningState();
+			while(running) {
+				step();
+				updateBoard();
+				try {
+					Thread.sleep(delta);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	public void pause() {//Stop the execution of the game (if running)
+		if(running) {
+			running = false;
+			updateRunningState();
+		}
+	}
+
+	public boolean isRunning() {
+		return running;
+	}
 
 	private int countAlive(int i, int j, int height, int width)
 	{
@@ -88,6 +119,12 @@ public class Game {
 			o.onBoardUpdate();
 		}
 	}
+	
+	private void updateRunningState() {
+		for(GameObserver o : observers) {
+			o.onRunningUpdate(running);
+		}
+	}
 
 	public String getStringBoard() {
 		String ret = "";
@@ -109,6 +146,14 @@ public class Game {
 
 	public boolean[][] getBoard() {
 		return board;
+	}
+	
+	public long getDelta() {
+		return delta;
+	}
+
+	public void setDelta(long delta) {
+		this.delta = delta;
 	}
 
 	public int getRows() {
