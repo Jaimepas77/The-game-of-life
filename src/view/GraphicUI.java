@@ -29,12 +29,13 @@ public class GraphicUI extends JFrame implements Viewer{
 		this.setLayout(new BorderLayout());
 		
 		//Toolbar (NORTH)
-		JToolBar tools = new ToolBar(game);
+		ToolBar tools = new ToolBar(game);
 		this.add(tools, BorderLayout.NORTH);
 
 		//Board (CENTER)
-		JPanel board = new BoardGrid(game);
+		BoardGrid board = new BoardGrid(game);
 		this.add(board, BorderLayout.CENTER);
+		tools.addObserver(board);
 
 		//Adapt the window appearance
 		this.setBounds(200, 50, 900, 600);//Default size and position if not maximised

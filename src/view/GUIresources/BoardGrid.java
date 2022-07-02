@@ -10,8 +10,9 @@ import javax.swing.JPanel;
 
 import model.Game;
 import model.GameObserver;
+import view.ColorObserver;
 
-public class BoardGrid extends JPanel implements GameObserver {
+public class BoardGrid extends JPanel implements GameObserver, ColorObserver {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -19,6 +20,8 @@ public class BoardGrid extends JPanel implements GameObserver {
 	private JButton[][] boardBoxes;//Boxes of the board
 	private int numRows;
 	private int numCols;
+	private Color aliveColor = Color.YELLOW;
+	private Color deadColor = Color.WHITE;
 
 	public BoardGrid(Game game) {
 		super();
@@ -39,7 +42,7 @@ public class BoardGrid extends JPanel implements GameObserver {
 			for(int j = 0; j < numCols; j++) {
 				//Initialising button properties
 				boardBoxes[i][j] = new JButton();
-				boardBoxes[i][j].setBackground(Color.WHITE);
+				boardBoxes[i][j].setBackground(deadColor);
 				boardBoxes[i][j].setBorderPainted(true);
 
 				//button actions configuration
@@ -66,16 +69,28 @@ public class BoardGrid extends JPanel implements GameObserver {
 		for(int i = 0; i < numRows; i++) {
 			for(int j = 0; j < numCols; j++) {
 				if(board[i][j]) {
-					if(boardBoxes[i][j].getBackground() != Color.YELLOW) {
-						boardBoxes[i][j].setBackground(Color.YELLOW);
+					if(boardBoxes[i][j].getBackground() != aliveColor) {
+						boardBoxes[i][j].setBackground(aliveColor);
 					}
 				}
 				else {
-					if(boardBoxes[i][j].getBackground() != Color.WHITE) {//Only act if it is necessary (to prevent lag)
-						boardBoxes[i][j].setBackground(Color.WHITE);
+					if(boardBoxes[i][j].getBackground() != deadColor) {//Only act if it is necessary (to prevent lag)
+						boardBoxes[i][j].setBackground(deadColor);
 					}
 				}
 			}
 		}
+	}
+	
+	@Override
+	public void onFirstColorUpdate(Color c) {
+		aliveColor = c;
+		onBoardUpdate();
+	}
+	
+	@Override
+	public void onSecondColorUpdate(Color c) {
+		deadColor = c;
+		onBoardUpdate();
 	}
 }

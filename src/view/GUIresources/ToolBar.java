@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -18,11 +19,12 @@ import javax.swing.event.ChangeListener;
 
 import model.Game;
 import model.GameObserver;
+import view.ColorObserver;
 
 public class ToolBar extends JToolBar implements GameObserver {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private static final long minDelta = 50;
 	private static final long maxDelta = 3000;
 	private static final Color defaultColor = new Color(255, 255, 230);
@@ -33,10 +35,12 @@ public class ToolBar extends JToolBar implements GameObserver {
 	private JButton playPause;
 	private JLabel deltaLabel = new JLabel("Delay:");
 	private JSlider deltaSlider;
-	private JColorChooser colorChooser;
+	private JButton openColorChooser;
 
 	private String playLabel = "PLAY";
 	private String pauseLabel = "PAUSE";
+
+	private ArrayList<ColorObserver> observers = new ArrayList<ColorObserver>();
 
 	public ToolBar(Game game) {
 		this.game = game;
@@ -51,16 +55,34 @@ public class ToolBar extends JToolBar implements GameObserver {
 		initClearButton();
 		initPlayPauseButton();
 		initDeltaSetter();
+		initColorChooser();
+	}
+
+	private void initColorChooser() {
+		openColorChooser = new JButton("Color configuration");
+		openColorChooser.setToolTipText("Configure the color that the squares will use when switching on");
+		this.add(openColorChooser);
+
+		openColorChooser.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Color c = JColorChooser.showDialog(null, "Choose the main color", Color.YELLOW);
+				if(c != null) {
+					updateFirstColor(c);
+				}
+			}
+		});
 	}
 
 	private void initDeltaSetter() {
 		this.add(deltaLabel);
 		deltaSlider = new JSlider(SwingConstants.HORIZONTAL, (int)minDelta, (int)maxDelta, (int)game.getDelta());
 		deltaSlider.setToolTipText((double)game.getDelta()/1000 + " seconds");
-		
+
 		deltaSlider.setBackground(defaultColor);
 		deltaSlider.setMaximumSize(new Dimension(150, 15));
-		
+
 		this.add(deltaSlider);
 		deltaSlider.addChangeListener(new ChangeListener() {
 
@@ -148,6 +170,16 @@ public class ToolBar extends JToolBar implements GameObserver {
 				thread.start();
 			}
 		});
+	}
+
+	public void addObserver(ColorObserver c) {
+		observers.add(c);
+	}
+	
+	public void updateFirstColor(Color c) {
+		for(ColorObserver o : observers) {
+			o.onFirstColorUpdate(c);
+		}
 	}
 
 	@Override

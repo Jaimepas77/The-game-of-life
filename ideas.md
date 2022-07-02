@@ -10,10 +10,11 @@ Having stated the general porpuse of this project, any other idea (mainly more s
 
 ## Abstract ideas
 
-- Doing an UML diagram for general planning
+- Doing an UML diagram for general planning -> NO
 - idea3
 
 ## Implementation ideas
 
-- Setter for the board active cells color
-- idea4
+- Setter for the board active cells color -> done (maybe do a second color, the background one)
+- Undo step option (stack of past states)
+- Load patterns from files
