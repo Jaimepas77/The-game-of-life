@@ -1,7 +1,10 @@
 package controller;
 
+import javax.swing.JOptionPane;
+
 import model.Game;
 import view.BatchUI;
+import view.GraphicUI;
 import view.Viewer;
 
 public class Controller {
@@ -19,6 +22,12 @@ public class Controller {
 		game = new Game(DEFAULT_ROWS, DEFAULT_COLUMNS);
 		
 		//Choose the interface type (batch - GUI) and run it
-		view = new BatchUI(game);
+		int op = JOptionPane.showConfirmDialog(null, "¿Quieres emplear la interfaz gráfica?", "Elegir interfaz", JOptionPane.YES_NO_OPTION);
+		if(op == JOptionPane.YES_OPTION) {
+			view = new GraphicUI(game);
+		}
+		else {
+			view = new BatchUI(game);
+		}
 	}
 }

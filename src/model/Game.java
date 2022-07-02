@@ -1,23 +1,32 @@
 package model;
 
+import java.util.ArrayList;
+
 public class Game {
+	public static final String TITLE = "THE GAME OF LIFE";
+
 	private int rows, columns;//Size of the board
 	//	x	,	y
 
 	//Board
 	private boolean board[][];
+	
+	//Observers (observer pattern)
+	ArrayList<GameObserver> observers = new ArrayList<GameObserver>();
 
 	public Game(int rows, int columns)
 	{
 		this.rows = rows;
 		this.columns = columns;
-		board = new boolean[rows][columns];//Inicializado a false
+		board = new boolean[rows][columns];//Initialised to false
 	}
 
 	public void setSquareState(boolean state, int x, int y)	//Set the square to on or off
 	{
 		//Board.setSquareState(state, x, y);
 		board[x][y] = state;
+		
+		updateBoard();
 	}
 
 	public boolean getSquareState(int x, int y)
@@ -48,6 +57,8 @@ public class Game {
 		}
 
 		board = ret;
+		
+		updateBoard();
 	}
 
 	private int countAlive(int i, int j, int height, int width)
@@ -68,8 +79,17 @@ public class Game {
 		return ret;
 	}
 
+	public void addObserver(GameObserver o) {
+		observers.add(o);
+	}
+	
+	private void updateBoard() {
+		for(GameObserver o : observers) {
+			o.onBoardUpdate();
+		}
+	}
 
-	public String getBoard() {
+	public String getStringBoard() {
 		String ret = "";
 
 		for(boolean[] r : board) {
@@ -85,5 +105,17 @@ public class Game {
 		}
 
 		return ret;
+	}
+
+	public boolean[][] getBoard() {
+		return board;
+	}
+
+	public int getRows() {
+		return rows;
+	}
+
+	public int getColumns() {
+		return columns;
 	}
 }

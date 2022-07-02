@@ -1,16 +1,8 @@
 package view;
 
-import model.Game;
+public interface Viewer {
 
-public abstract class Viewer {
-	protected Game game;
-
-	public Viewer(Game game) {
-		this.game = game;
-		run();
-	}
-	
-	public void run() {
-		System.err.println("Viewer not implemented");
+	public default void runUI() {
+		System.err.println("Viewer not implemented yet");
 	}
 }

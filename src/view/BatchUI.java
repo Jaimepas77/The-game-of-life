@@ -4,21 +4,19 @@ import java.util.Scanner;
 
 import model.Game;
 
-public class BatchUI extends Viewer {
+public class BatchUI implements Viewer {
 	private static Scanner in = new Scanner(System.in);
 	private static boolean exit = false;
+	private Game game;
 	
 	public BatchUI(Game game) {
-		super(game);
+		this.game = game;
+		runUI();
 	}
 	
-	public void run() {
-		runBatch();
-	}
-	
-	public void runBatch() {
+	public void runUI() {
 		while(!exit) {
-			System.out.println(game.getBoard()); // refreshBoard
+			System.out.println(game.getStringBoard()); // refreshBoard
 
 			try {
 				String[] command = getCommand();
