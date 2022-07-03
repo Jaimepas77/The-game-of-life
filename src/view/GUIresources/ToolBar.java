@@ -30,6 +30,7 @@ public class ToolBar extends JToolBar implements GameObserver {
 	private static final Color defaultColor = new Color(255, 255, 230);
 
 	private Game game;
+	private JButton stepBack;
 	private JButton step;
 	private JButton clear;
 	private JButton playPause;
@@ -51,6 +52,7 @@ public class ToolBar extends JToolBar implements GameObserver {
 	}
 
 	private void initTools() {
+		initStepBackButton();
 		initStepButton();
 		initClearButton();
 		initPlayPauseButton();
@@ -120,6 +122,8 @@ public class ToolBar extends JToolBar implements GameObserver {
 						else {
 							game.pause();
 						}
+
+						stepBack.setEnabled(true);
 					}
 				};
 
@@ -140,9 +144,11 @@ public class ToolBar extends JToolBar implements GameObserver {
 
 				Runnable myRunnable = new Runnable(){
 					public void run(){
-						for(int i = 0; i < game.getRows(); i++)
-							for(int j = 0; j < game.getColumns(); j++)
-								game.setSquareState(false, i, j);
+						game.clearBoard();
+
+						if(game.isTherePast()) {
+							stepBack.setEnabled(true);
+						}
 					}
 				};
 
@@ -163,6 +169,38 @@ public class ToolBar extends JToolBar implements GameObserver {
 				Runnable myRunnable = new Runnable(){
 					public void run(){
 						game.step();
+						if(game.isTherePast()) {
+							stepBack.setEnabled(true);
+						}
+					}
+				};
+
+				Thread thread = new Thread(myRunnable);
+				thread.start();
+			}
+		});
+	}
+
+	private void initStepBackButton() {
+		stepBack = new JButton("Step back");
+		stepBack.setToolTipText("Undo one step in the game");
+		stepBack.setEnabled(false);
+		this.add(stepBack);
+		stepBack.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Runnable myRunnable = new Runnable(){
+					public void run(){
+						if(!game.stepBack())
+							System.out.println("ERROR stepBack");
+						
+						if(game.isTherePast()) {
+							stepBack.setEnabled(true);
+						}
+						else {
+							stepBack.setEnabled(false);
+						}
 					}
 				};
 
@@ -175,7 +213,7 @@ public class ToolBar extends JToolBar implements GameObserver {
 	public void addObserver(ColorObserver c) {
 		observers.add(c);
 	}
-	
+
 	public void updateFirstColor(Color c) {
 		for(ColorObserver o : observers) {
 			o.onFirstColorUpdate(c);
@@ -189,12 +227,17 @@ public class ToolBar extends JToolBar implements GameObserver {
 			step.setEnabled(false);
 			clear.setEnabled(false);
 			deltaSlider.setEnabled(false);
+			stepBack.setEnabled(false);
 		}
 		else {
 			playPause.setText(playLabel);
 			step.setEnabled(true);
 			clear.setEnabled(true);
 			deltaSlider.setEnabled(true);
+
+			if(game.isTherePast()) {
+				stepBack.setEnabled(true);
+			}
 		}
 	}
 }

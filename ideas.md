@@ -16,5 +16,7 @@ Having stated the general porpuse of this project, any other idea (mainly more s
 ## Implementation ideas
 
 - Setter for the board active cells color -> done (maybe do a second color, the background one)
-- Undo step option (stack of past states)
+- Undo step option (stack of past states) -> done
 - Load patterns from files
+- Making the board a torus (geometric topology) (easy)
+- Personalise option for the size of the board
