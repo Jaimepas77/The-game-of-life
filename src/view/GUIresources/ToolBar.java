@@ -6,11 +6,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
@@ -19,35 +17,34 @@ import javax.swing.event.ChangeListener;
 
 import model.Game;
 import model.GameObserver;
-import view.ColorObserver;
 
 public class ToolBar extends JToolBar implements GameObserver {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final long minDelta = 50;
-	private static final long maxDelta = 3000;
-	private static final Color defaultColor = new Color(255, 255, 230);
+	private static final double MIN_SPEED = 0.25;
+	private static final double MAX_SPEED = 4;
+	private static final Color DEFAULT_COLOR = new Color(255, 255, 230);
 
 	private Game game;
 	private JButton stepBack;
 	private JButton step;
 	private JButton clear;
 	private JButton playPause;
-	private JLabel deltaLabel = new JLabel("Delay:");
-	private JSlider deltaSlider;
+	private JLabel speedLabel = new JLabel("Speed:");
+	private JSlider speedSlider;
 	private JButton openColorChooser;
 
 	private String playLabel = "PLAY";
 	private String pauseLabel = "PAUSE";
 
-	private ArrayList<ColorObserver> observers = new ArrayList<ColorObserver>();
+	private ArrayList<ToolBarObserver> observers = new ArrayList<ToolBarObserver>();
 
 	public ToolBar(Game game) {
 		this.game = game;
 		game.addObserver(this);
 
-		this.setBackground(defaultColor);
+		this.setBackground(DEFAULT_COLOR);
 		initTools();
 	}
 
@@ -56,7 +53,7 @@ public class ToolBar extends JToolBar implements GameObserver {
 		initStepButton();
 		initClearButton();
 		initPlayPauseButton();
-		initDeltaSetter();
+		initSpeedSetter();
 		initColorChooser();
 	}
 
@@ -77,16 +74,16 @@ public class ToolBar extends JToolBar implements GameObserver {
 		});
 	}
 
-	private void initDeltaSetter() {
-		this.add(deltaLabel);
-		deltaSlider = new JSlider(SwingConstants.HORIZONTAL, (int)minDelta, (int)maxDelta, (int)game.getDelta());
-		deltaSlider.setToolTipText((double)game.getDelta()/1000 + " seconds");
+	private void initSpeedSetter() {
+		this.add(speedLabel);
+		speedSlider = new JSlider(SwingConstants.HORIZONTAL, (int) (MIN_SPEED*100), (int) (MAX_SPEED*100), (int) (game.getSpeed()*100));
+		speedSlider.setToolTipText("x" + game.getSpeed());
 
-		deltaSlider.setBackground(defaultColor);
-		deltaSlider.setMaximumSize(new Dimension(150, 15));
+		speedSlider.setBackground(DEFAULT_COLOR);
+		speedSlider.setMaximumSize(new Dimension(150, 15));
 
-		this.add(deltaSlider);
-		deltaSlider.addChangeListener(new ChangeListener() {
+		this.add(speedSlider);
+		speedSlider.addChangeListener(new ChangeListener() {
 
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -94,8 +91,8 @@ public class ToolBar extends JToolBar implements GameObserver {
 				Runnable myRunnable =
 						new Runnable(){
 					public void run(){
-						game.setDelta(deltaSlider.getValue());
-						deltaSlider.setToolTipText((double)game.getDelta()/1000 + " seconds");
+						game.setSpeed((double)speedSlider.getValue()/100);
+						speedSlider.setToolTipText("x" + game.getSpeed());
 					}
 				};
 
@@ -210,12 +207,12 @@ public class ToolBar extends JToolBar implements GameObserver {
 		});
 	}
 
-	public void addObserver(ColorObserver c) {
+	public void addObserver(ToolBarObserver c) {
 		observers.add(c);
 	}
 
 	public void updateFirstColor(Color c) {
-		for(ColorObserver o : observers) {
+		for(ToolBarObserver o : observers) {
 			o.onFirstColorUpdate(c);
 		}
 	}
@@ -226,18 +223,23 @@ public class ToolBar extends JToolBar implements GameObserver {
 			playPause.setText(pauseLabel);
 			step.setEnabled(false);
 			clear.setEnabled(false);
-			deltaSlider.setEnabled(false);
-			stepBack.setEnabled(false);
+			speedSlider.setEnabled(false);
 		}
 		else {
 			playPause.setText(playLabel);
 			step.setEnabled(true);
 			clear.setEnabled(true);
-			deltaSlider.setEnabled(true);
-
-			if(game.isTherePast()) {
-				stepBack.setEnabled(true);
-			}
+			speedSlider.setEnabled(true);
+		}
+	}
+	
+	@Override
+	public void onBoardUpdate() {
+		if(game.isTherePast() && !game.isRunning()) {
+			stepBack.setEnabled(true);
+		}
+		else {
+			stepBack.setEnabled(false);;
 		}
 	}
 }

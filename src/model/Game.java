@@ -6,6 +6,8 @@ import java.util.Arrays;
 
 public class Game {
 	public static final String TITLE = "THE GAME OF LIFE";
+	private static final int PAST_LIMIT = 80;//Limit to the amount of past states stored
+	private static final long DELTA = 500;//The delay between steps in the running process (at speed 1)
 
 	private int rows, columns;//Size of the board
 	//	x	,	y
@@ -18,7 +20,7 @@ public class Game {
 	ArrayList<GameObserver> observers = new ArrayList<GameObserver>();
 
 	private boolean running = false; //Whether the game is running or not
-	private long delta = 1000;//The delay between steps in the running process
+	private double speed = 1;//Modifier of the standard speed
 
 	public Game(int rows, int columns)
 	{
@@ -29,7 +31,6 @@ public class Game {
 
 	public void setSquareState(boolean state, int x, int y)	//Set the square to on or off
 	{
-		//Board.setSquareState(state, x, y);
 		storePresent();
 		board[x][y] = state;
 
@@ -38,7 +39,6 @@ public class Game {
 
 	public boolean getSquareState(int x, int y)
 	{
-		//Board.getSquareState(x, y);
 		return board[x][y];
 	}
 
@@ -50,7 +50,7 @@ public class Game {
 					board[i][j] = false;
 			}
 		}
-		
+
 		updateBoard();
 	}
 
@@ -83,6 +83,10 @@ public class Game {
 
 	public boolean stepBack() {//Return whether there was a past state or not to be restored
 		if(past.size() > 0) {
+			while(past.size() > 1 && equalsBoard(past.getLast(), board)) {//While the past is the same as the present...
+				past.removeLast();//Ignore this state
+			}
+			
 			board = past.removeLast();
 			updateBoard();
 			return true;
@@ -91,20 +95,23 @@ public class Game {
 			return false;
 		}
 	}
-	
+
 	public boolean isTherePast() {
 		return past.size() > 0;//Is there any past state stored?
 	}
-	
+
 	private void storePresent() {
-		boolean tmp[][] = new boolean[rows][columns];//Copy of the board
-		for(int i = 0; i < rows; i++) {
-			tmp[i] = Arrays.copyOf(board[i], columns);
-		}
-		
-		past.addLast(tmp);//Update the stack of last movements
-		if(past.size() > 50) {//Limit the amount of past movements to 50
-			past.removeFirst();
+		if(past.size() == 0 || !equalsBoard(board, past.getLast()))//If the board has changed from the last one... (otherwise don't save the same board two times)
+		{
+			boolean tmp[][] = new boolean[rows][columns];//Copy of the board
+			for(int i = 0; i < rows; i++) {
+				tmp[i] = Arrays.copyOf(board[i], columns);
+			}
+
+			past.addLast(tmp);//Update the stack of last movements
+			if(past.size() > PAST_LIMIT) {//Limit the amount of past movements to 50 (or other number)
+				past.removeFirst();
+			}
 		}
 	}
 
@@ -116,12 +123,12 @@ public class Game {
 				step();
 				updateBoard();
 				try {
-					Thread.sleep(delta);
+					Thread.sleep((long) (DELTA/speed));
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				
-				if(compareBoard(past.getLast(), board)) {
+
+				if(equalsBoard(past.getLast(), board)) {
 					running = false;
 				}
 			}
@@ -129,13 +136,14 @@ public class Game {
 		}
 	}
 
-	private boolean compareBoard(boolean[][] board1, boolean[][] board2) {
+	private boolean equalsBoard(boolean[][] board1, boolean[][] board2) {
 
 		if(board1.length != board2.length) {
 			return false;
 		}
+
 		for(int i = 0; i < board1.length; i++) {
-			if(board1[i].length != board2.length) {
+			if(board1[i].length != board2[i].length) {
 				return false;
 			}
 			for(int j = 0; j < board1[i].length; j++) {
@@ -144,7 +152,8 @@ public class Game {
 				}
 			}
 		}
-		return true;
+
+		return true;//If any difference is found false is returned; true otherwise
 	}
 
 	public void pause() {//Stop the execution of the game (if running)
@@ -214,12 +223,12 @@ public class Game {
 		return board;
 	}
 
-	public long getDelta() {
-		return delta;
+	public double getSpeed() {
+		return speed;
 	}
 
-	public void setDelta(long delta) {
-		this.delta = delta;
+	public void setSpeed(double speed) {
+		this.speed = speed;
 	}
 
 	public int getRows() {

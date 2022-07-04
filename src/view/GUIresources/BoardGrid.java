@@ -10,9 +10,8 @@ import javax.swing.JPanel;
 
 import model.Game;
 import model.GameObserver;
-import view.ColorObserver;
 
-public class BoardGrid extends JPanel implements GameObserver, ColorObserver {
+public class BoardGrid extends JPanel implements GameObserver, ToolBarObserver {
 
 	private static final long serialVersionUID = 1L;
 	

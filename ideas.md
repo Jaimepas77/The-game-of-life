@@ -17,6 +17,7 @@ Having stated the general porpuse of this project, any other idea (mainly more s
 
 - Setter for the board active cells color -> done (maybe do a second color, the background one)
 - Undo step option (stack of past states) -> done
+- Replacing delay by speed -> done
 - Load patterns from files
 - Making the board a torus (geometric topology) (easy)
 - Personalise option for the size of the board
