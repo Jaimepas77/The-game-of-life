@@ -1,8 +1,11 @@
 package model;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class Game {
 	public static final String TITLE = "THE GAME OF LIFE";
@@ -22,6 +25,8 @@ public class Game {
 	private boolean running = false; //Whether the game is running or not
 	private double speed = 1;//Modifier of the standard speed
 
+	private boolean[][] toBeInserted = null;
+
 	public Game(int rows, int columns)
 	{
 		this.rows = rows;
@@ -40,6 +45,100 @@ public class Game {
 	public boolean getSquareState(int x, int y)
 	{
 		return board[x][y];
+	}
+
+	public void readFromFile(File file) throws FileNotFoundException {
+		String name = file.getName();
+		String type = name.substring(name.length() - 3);
+
+		if(type.equals("rle")) {
+			toBeInserted = readFromFileRLE(file);
+		}
+		else {
+			toBeInserted = null;
+			System.err.println("format not implemented yet");
+		}
+	}
+
+	private boolean[][] readFromFileRLE(File file) throws FileNotFoundException {
+		boolean ret[][] = null;
+
+		Scanner text = new Scanner(file);
+		String line = text.nextLine();
+		while(line.length() == 0 || line.charAt(0) == '#') {
+			line = text.nextLine();
+		}
+
+		String info[] = line.split(" ");
+		int x = 0;
+		int y = 0;
+		if(info.length == 6 || info.length == 9) {//Size of a normal RLE header
+
+			info[2] = info[2].substring(0, info[2].length()-1);//Delete the last character (',')
+			y = Integer.parseInt(info[2]);
+
+			if(info.length == 9) {//If the y number is going to have a ','
+				info[5] = info[5].substring(0, info[5].length()-1);
+			}
+			x = Integer.parseInt(info[5]);
+
+			ret = new boolean[x][y];
+		}
+		else {
+			System.err.println("Invalid header while reading an RLE file");
+		}
+
+		String str = text.next();
+		while(str.charAt(str.length()-1) != '!') {
+			str += text.next();
+		}
+
+		int i = 0, j = 0;
+		int num = -1;
+		for(char c : str.toCharArray()) {
+			if(c >= '0' && c <= '9') {
+				if(num == -1) {
+					num = c - '0';
+				}
+				else {
+					num *= 10;
+					num += (c - '0');
+				}
+			}
+			else if(c == '$') {
+				i++;
+				j = 0;
+			}
+			else if(c == '!') {
+				break;
+			}
+			else {
+				if(num == -1) {
+					num = 1;
+				}
+				
+				for(int k = 0; k < num; k++) {
+					ret[i][j] = (c == 'o');
+					j++;
+				}
+
+				num = -1;
+			}
+		}
+
+		text.close();
+		return ret;
+	}
+
+	public void insertToBeInserted(int x, int y) {
+		for(int i = x; i < toBeInserted.length + x && i < rows;i++) {
+			for(int j = y; j < toBeInserted[i-x].length + y && j < columns; j++) {
+				board[i][j] = toBeInserted[i-x][j-y];
+			}
+		}
+
+		toBeInserted = null;//After inserted, it gets deleted
+		updateBoard();
 	}
 
 	public void clearBoard() {
@@ -86,7 +185,7 @@ public class Game {
 			while(past.size() > 1 && equalsBoard(past.getLast(), board)) {//While the past is the same as the present...
 				past.removeLast();//Ignore this state
 			}
-			
+
 			board = past.removeLast();
 			updateBoard();
 			return true;
@@ -121,7 +220,6 @@ public class Game {
 			updateRunningState();
 			while(running) {
 				step();
-				updateBoard();
 				try {
 					Thread.sleep((long) (DELTA/speed));
 				} catch (InterruptedException e) {
@@ -237,5 +335,14 @@ public class Game {
 
 	public int getColumns() {
 		return columns;
+	}
+
+	public boolean isToBeInserted() {
+		if(toBeInserted == null) {
+			return false;
+		}
+		else {
+			return true;
+		}
 	}
 }

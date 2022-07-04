@@ -8,7 +8,7 @@ import view.GraphicUI;
 
 public class Controller {
 	public static final int DEFAULT_ROWS = 30;
-	public static final int DEFAULT_COLUMNS = 30;
+	public static final int DEFAULT_COLUMNS = 40;
 
 	//the game itself
 	private static Game game;

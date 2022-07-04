@@ -50,7 +50,12 @@ public class BoardGrid extends JPanel implements GameObserver, ToolBarObserver {
 				boardBoxes[i][j].addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						game.setSquareState(!game.getSquareState(x, y), x, y);//Invert squares state
+						if(!game.isToBeInserted()) {
+							game.setSquareState(!game.getSquareState(x, y), x, y);//Invert squares state
+						}
+						else {
+							game.insertToBeInserted(x, y);
+						}
 					}
 				}
 				);

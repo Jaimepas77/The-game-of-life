@@ -11,7 +11,8 @@ Having stated the general porpuse of this project, any other idea (mainly more s
 ## Abstract ideas
 
 - Doing an UML diagram for general planning -> NO
-- idea3
+- Game mode to select a certain area of the board. After this, you may be able to save it in a file or move it to another part of the board.
+- Speed variations (enable an extreme speed slider with a button or smth like that)
 
 ## Implementation ideas
 

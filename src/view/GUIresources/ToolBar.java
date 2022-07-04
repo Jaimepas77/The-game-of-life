@@ -4,16 +4,19 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import model.Game;
 import model.GameObserver;
@@ -34,6 +37,7 @@ public class ToolBar extends JToolBar implements GameObserver {
 	private JLabel speedLabel = new JLabel("Speed:");
 	private JSlider speedSlider;
 	private JButton openColorChooser;
+	private JButton openFileChooser;
 
 	private String playLabel = "PLAY";
 	private String pauseLabel = "PAUSE";
@@ -55,6 +59,33 @@ public class ToolBar extends JToolBar implements GameObserver {
 		initPlayPauseButton();
 		initSpeedSetter();
 		initColorChooser();
+		initLoadButton();
+	}
+
+	private void initLoadButton() {
+		openFileChooser = new JButton("Load file");
+		openFileChooser.setToolTipText("Load a game of life file");
+		this.add(openFileChooser);
+
+		openFileChooser.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser chooser = new JFileChooser();
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("Game of life files", "rle", "txt");
+				chooser.setFileFilter(filter);
+				int returnVal = chooser.showOpenDialog(openFileChooser);
+				if(returnVal == JFileChooser.APPROVE_OPTION) {
+					//Here things will be done
+					try {
+						game.readFromFile(chooser.getSelectedFile());
+					} catch (FileNotFoundException e1) {
+						e1.printStackTrace();
+					}
+//					System.out.println("You chose to open this file: " + chooser.getSelectedFile().getName());
+				}
+			}
+		});
 	}
 
 	private void initColorChooser() {
@@ -191,7 +222,7 @@ public class ToolBar extends JToolBar implements GameObserver {
 					public void run(){
 						if(!game.stepBack())
 							System.out.println("ERROR stepBack");
-						
+
 						if(game.isTherePast()) {
 							stepBack.setEnabled(true);
 						}
@@ -232,7 +263,7 @@ public class ToolBar extends JToolBar implements GameObserver {
 			speedSlider.setEnabled(true);
 		}
 	}
-	
+
 	@Override
 	public void onBoardUpdate() {
 		if(game.isTherePast() && !game.isRunning()) {
