@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,6 +59,7 @@ public class Game {
 		x1 = x;
 		y1 = y;
 		selectionState = 2;
+		updateSelectionMode();
 		updateBoard();
 	}
 
@@ -74,6 +76,7 @@ public class Game {
 			}
 		}
 
+		updateSelectionMode();
 		updateBoard();
 	}
 
@@ -86,7 +89,7 @@ public class Game {
 		else {
 			type = "";
 		}
-		
+
 		if(type.equals(".rle")) {
 			toBeInserted = readFromFileRLE(file);
 		}
@@ -168,7 +171,7 @@ public class Game {
 
 	public void insertToBeInserted(int x, int y) {
 		storePresent();
-		
+
 		for(int i = x; i < toBeInserted.length + x && i < rows;i++) {
 			for(int j = y; j < toBeInserted[i-x].length + y && j < columns; j++) {
 				board[i][j] = toBeInserted[i-x][j-y];
@@ -182,10 +185,11 @@ public class Game {
 		else {
 			selectionState = 0;
 		}
+		updateSelectionMode();
 		updateBoard();
 	}
 
-	public void saveToBeInserted(File file) throws FileNotFoundException {
+	public void saveToBeInserted(File file) throws FileNotFoundException, FileAlreadyExistsException {
 		//Save the structure in a file in RLE format
 		String name = file.getName();
 		String type;
@@ -205,26 +209,31 @@ public class Game {
 				FileWriter myWriter = new FileWriter(file);
 				myWriter.write(encodeToBeInserted());
 				myWriter.close();
-//				System.out.println("Successfully wrote to the file.");
-				toBeInserted = null;
-				selectionState = 0;
-				updateBoard();
+				//				System.out.println("Successfully wrote to the file.");
 			}
 			else {
-				System.out.println("A file with that name already exists");
+				System.err.println("A file with that name already exists");
+				throw new FileAlreadyExistsException(file.getName(), null, "The file couldn't be stored because a file with that exact name already exists.");
 			}
 
+		} catch (FileAlreadyExistsException e) {
+			throw e;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		toBeInserted = null;
+		selectionState = 0;
+		updateSelectionMode();
+		updateBoard();
 	}
 
 	private String encodeToBeInserted() {
 		String ret = "";
-		
+
 		ret = "x = " + toBeInserted[0].length + ", y = " + toBeInserted.length;
 		ret += "\n";
-		
+
 		//Encode the array
 		int alive = 0;
 		int dead = 0;
@@ -236,7 +245,7 @@ public class Game {
 						ret += dead + "b";
 						dead = 0;
 					}
-					
+
 					alive++;
 				}
 				else {
@@ -244,7 +253,7 @@ public class Game {
 						ret += alive + "o";
 						alive = 0;
 					}
-					
+
 					dead++;
 				}
 			}
@@ -260,7 +269,7 @@ public class Game {
 			alive = 0;
 			dead = 0;
 		}
-		
+
 		return ret;
 	}
 
@@ -397,6 +406,8 @@ public class Game {
 		{
 			int a = i + x[k];
 			int b = j + y[k];
+			a = (a + height) % height;
+			b = (b + width) % width;
 			if(a >= 0 && a < height && b >= 0 && b < width && board[a][b])
 			{
 				ret++;
@@ -419,6 +430,12 @@ public class Game {
 	private void updateRunningState() {
 		for(GameObserver o : observers) {
 			o.onRunningUpdate(running);
+		}
+	}
+
+	private void updateSelectionMode() {
+		for(GameObserver o : observers) {
+			o.onSelectionMode(selectionState);
 		}
 	}
 
@@ -479,6 +496,7 @@ public class Game {
 
 	public void setSelectionState(int selectionState) {
 		this.selectionState = selectionState;
+		updateSelectionMode();
 		updateBoard();
 	}
 

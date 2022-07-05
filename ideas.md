@@ -11,7 +11,7 @@ Having stated the general porpuse of this project, any other idea (mainly more s
 ## Abstract ideas
 
 - Doing an UML diagram for general planning -> NO
-- Game mode to select a certain area of the board. After this, you may be able to save it in a file or move it to another part of the board.
+- Game mode to select a certain area of the board. After this, you may be able to save it in a file or move it to another part of the board. -> done
 - Speed variations (enable an extreme speed slider with a button or smth like that)
 
 ## Implementation ideas
@@ -20,5 +20,5 @@ Having stated the general porpuse of this project, any other idea (mainly more s
 - Undo step option (stack of past states) -> done
 - Replacing delay by speed -> done
 - Load patterns from files -> done
-- Making the board a torus (geometric topology) (easy)
+- Making the board a torus (geometric topology) (easy) -> done
 - Personalise option for the size of the board

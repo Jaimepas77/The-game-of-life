@@ -7,12 +7,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.FileNotFoundException;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
@@ -74,14 +76,14 @@ public class ToolBar extends JToolBar implements GameObserver {
 		save.setToolTipText("Save the copied structure into a game of life file");
 		save.setVisible(false);//Not visible when you can't save anything
 		this.add(save);
-		
+
 		save.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser chooser = new JFileChooser();
 				FileNameExtensionFilter filter = new FileNameExtensionFilter("Game of life files", "rle");
-				chooser.addChoosableFileFilter(filter);
+				chooser.setFileFilter(filter);
 				int returnVal = chooser.showSaveDialog(load);
 				if(returnVal == JFileChooser.APPROVE_OPTION) {
 					try {
@@ -89,6 +91,9 @@ public class ToolBar extends JToolBar implements GameObserver {
 					}
 					catch(FileNotFoundException e1) {
 						e1.printStackTrace();
+					}
+					catch(FileAlreadyExistsException e2) {
+						JOptionPane.showMessageDialog(null, e2.getReason(), "Error", JOptionPane.ERROR_MESSAGE);
 					}
 				}
 			}
@@ -99,7 +104,7 @@ public class ToolBar extends JToolBar implements GameObserver {
 		selectionMode = new JToggleButton("Selection mode", false);
 		selectionMode.setToolTipText("Enable a mode where you can select a certain area of the board by clicking in two places of it");
 		this.add(selectionMode);
-		
+
 		selectionMode.addItemListener(new ItemListener() {
 
 			@Override
@@ -107,26 +112,10 @@ public class ToolBar extends JToolBar implements GameObserver {
 				if(selectionMode.isSelected() == true) {
 					game.setSelectionState(1);//An enum would be more intuitive
 					game.deleteToBeInserted();
-
-					playPause.setEnabled(false);
-					stepBack.setEnabled(false);
-					step.setEnabled(false);
-					clear.setEnabled(false);
-					speedSlider.setEnabled(false);
-					load.setEnabled(false);
 				}
 				else {
 					game.setSelectionState(0);
 					game.deleteToBeInserted();
-
-					playPause.setEnabled(true);
-					if(game.isTherePast() && !game.isRunning()) {
-						stepBack.setEnabled(true);
-					}
-					step.setEnabled(true);
-					clear.setEnabled(true);
-					speedSlider.setEnabled(true);
-					load.setEnabled(true);
 				}
 			}
 		});
@@ -152,7 +141,7 @@ public class ToolBar extends JToolBar implements GameObserver {
 					} catch (FileNotFoundException e1) {
 						e1.printStackTrace();
 					}
-//					System.out.println("You chose to open this file: " + chooser.getSelectedFile().getName());
+					//					System.out.println("You chose to open this file: " + chooser.getSelectedFile().getName());
 				}
 			}
 		});
@@ -204,7 +193,7 @@ public class ToolBar extends JToolBar implements GameObserver {
 	}
 
 	private void initPlayPauseButton() {
-		playPause = new JButton(playLabel );
+		playPause = new JButton(playLabel);
 		playPause.setToolTipText("Execute consecutive steps over the time");
 		this.add(playPause);
 		playPause.addActionListener(new ActionListener() {
@@ -327,7 +316,7 @@ public class ToolBar extends JToolBar implements GameObserver {
 			speedSlider.setEnabled(false);
 			load.setEnabled(false);
 			selectionMode.setEnabled(false);
-			
+
 			game.setSelectionState(0);//The selection mode gets restarted
 			selectionMode.setSelected(false);
 		}
@@ -349,15 +338,46 @@ public class ToolBar extends JToolBar implements GameObserver {
 		else {
 			stepBack.setEnabled(false);
 		}
-		
+
 		if(game.getSelectionState() == 3) {
 			save.setVisible(true);
 		}
 		else {
 			save.setVisible(false);
-//			if(game.getSelectionState() == 0) {
-//				selectionMode.setEnabled(false);
-//			}
+		}
+	}
+
+	@Override
+	public void onSelectionMode(int mode) {
+		if(mode == 0) {
+			save.setVisible(false);
+			selectionMode.setSelected(false);
+
+			if(game.isRunning() == false) {
+				playPause.setEnabled(true);
+				if(game.isTherePast() && !game.isRunning()) {
+					stepBack.setEnabled(true);
+				}
+				step.setEnabled(true);
+				clear.setEnabled(true);
+				speedSlider.setEnabled(true);
+				load.setEnabled(true);
+			}
+		}
+		else {
+			selectionMode.setSelected(true);
+			playPause.setEnabled(false);
+			step.setEnabled(false);
+			clear.setEnabled(false);
+			speedSlider.setEnabled(false);
+			load.setEnabled(false);
+
+			if(mode == 3) {
+				save.setVisible(true);
+			}
+			else {
+				save.setVisible(false);
+			}
 		}
 	}
 }
