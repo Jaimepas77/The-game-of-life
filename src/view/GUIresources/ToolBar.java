@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
@@ -12,6 +14,7 @@ import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
@@ -37,7 +40,9 @@ public class ToolBar extends JToolBar implements GameObserver {
 	private JLabel speedLabel = new JLabel("Speed:");
 	private JSlider speedSlider;
 	private JButton openColorChooser;
-	private JButton openFileChooser;
+	private JButton load;
+	private JToggleButton selectionMode;
+	private JButton save;
 
 	private String playLabel = "PLAY";
 	private String pauseLabel = "PAUSE";
@@ -60,21 +65,86 @@ public class ToolBar extends JToolBar implements GameObserver {
 		initSpeedSetter();
 		initColorChooser();
 		initLoadButton();
+		initSelectionMode();
+		initSaveButton();
+	}
+
+	private void initSaveButton() {
+		save = new JButton("Save");
+		save.setToolTipText("Save the copied structure into a game of life file");
+		save.setVisible(false);//Not visible when you can't save anything
+		this.add(save);
+		
+		save.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser chooser = new JFileChooser();
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("Game of life files", "rle");
+				chooser.addChoosableFileFilter(filter);
+				int returnVal = chooser.showSaveDialog(load);
+				if(returnVal == JFileChooser.APPROVE_OPTION) {
+					try {
+						game.saveToBeInserted(chooser.getSelectedFile());
+					}
+					catch(FileNotFoundException e1) {
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+	}
+
+	private void initSelectionMode() {
+		selectionMode = new JToggleButton("Selection mode", false);
+		selectionMode.setToolTipText("Enable a mode where you can select a certain area of the board by clicking in two places of it");
+		this.add(selectionMode);
+		
+		selectionMode.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if(selectionMode.isSelected() == true) {
+					game.setSelectionState(1);//An enum would be more intuitive
+					game.deleteToBeInserted();
+
+					playPause.setEnabled(false);
+					stepBack.setEnabled(false);
+					step.setEnabled(false);
+					clear.setEnabled(false);
+					speedSlider.setEnabled(false);
+					load.setEnabled(false);
+				}
+				else {
+					game.setSelectionState(0);
+					game.deleteToBeInserted();
+
+					playPause.setEnabled(true);
+					if(game.isTherePast() && !game.isRunning()) {
+						stepBack.setEnabled(true);
+					}
+					step.setEnabled(true);
+					clear.setEnabled(true);
+					speedSlider.setEnabled(true);
+					load.setEnabled(true);
+				}
+			}
+		});
 	}
 
 	private void initLoadButton() {
-		openFileChooser = new JButton("Load file");
-		openFileChooser.setToolTipText("Load a game of life file");
-		this.add(openFileChooser);
+		load = new JButton("Load file");
+		load.setToolTipText("Load a game of life file");
+		this.add(load);
 
-		openFileChooser.addActionListener(new ActionListener() {
+		load.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser chooser = new JFileChooser();
 				FileNameExtensionFilter filter = new FileNameExtensionFilter("Game of life files", "rle", "txt");
 				chooser.setFileFilter(filter);
-				int returnVal = chooser.showOpenDialog(openFileChooser);
+				int returnVal = chooser.showOpenDialog(load);
 				if(returnVal == JFileChooser.APPROVE_OPTION) {
 					//Here things will be done
 					try {
@@ -255,22 +325,39 @@ public class ToolBar extends JToolBar implements GameObserver {
 			step.setEnabled(false);
 			clear.setEnabled(false);
 			speedSlider.setEnabled(false);
+			load.setEnabled(false);
+			selectionMode.setEnabled(false);
+			
+			game.setSelectionState(0);//The selection mode gets restarted
+			selectionMode.setSelected(false);
 		}
 		else {
 			playPause.setText(playLabel);
 			step.setEnabled(true);
 			clear.setEnabled(true);
 			speedSlider.setEnabled(true);
+			load.setEnabled(true);
+			selectionMode.setEnabled(true);
 		}
 	}
 
 	@Override
 	public void onBoardUpdate() {
-		if(game.isTherePast() && !game.isRunning()) {
+		if(game.isTherePast() && !game.isRunning() && game.getSelectionState() == 0) {
 			stepBack.setEnabled(true);
 		}
 		else {
-			stepBack.setEnabled(false);;
+			stepBack.setEnabled(false);
+		}
+		
+		if(game.getSelectionState() == 3) {
+			save.setVisible(true);
+		}
+		else {
+			save.setVisible(false);
+//			if(game.getSelectionState() == 0) {
+//				selectionMode.setEnabled(false);
+//			}
 		}
 	}
 }

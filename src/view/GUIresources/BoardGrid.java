@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -47,10 +49,19 @@ public class BoardGrid extends JPanel implements GameObserver, ToolBarObserver {
 				//button actions configuration
 				int x = i;//A separate variable to preserve the final coordinates for the button
 				int y = j;
-				boardBoxes[i][j].addActionListener(new ActionListener() {
+				boardBoxes[i][j].addActionListener(new ActionListener() {//Click
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						if(!game.isToBeInserted()) {
+						if(game.getSelectionState() == 1) {
+							game.selectFirst(x, y);
+						}
+						else if(game.getSelectionState() == 2) {
+							game.selectSecond(x, y);
+						}
+						else if(game.getSelectionState() == 3) {
+							game.insertToBeInserted(x, y);//In fact, copy the selected area to the clicked place
+						}
+						else if(!game.isToBeInserted()) {
 							game.setSquareState(!game.getSquareState(x, y), x, y);//Invert squares state
 						}
 						else {
@@ -59,6 +70,32 @@ public class BoardGrid extends JPanel implements GameObserver, ToolBarObserver {
 					}
 				}
 				);
+				
+				boardBoxes[i][j].addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseEntered(MouseEvent e) {
+						if(game.isToBeInserted()) {
+							boolean[][] tmp = game.getToBeInserted();
+							for(int k = x; k-x < tmp.length && k < numRows; k++) {
+								for(int l = y; l-y < tmp[k-x].length && l < numCols; l++) {
+									if(tmp[k-x][l-y]) {
+										boardBoxes[k][l].setBackground(aliveColor.darker());
+									}
+									else {
+										boardBoxes[k][l].setBackground(deadColor.darker());//Paint the structure in a darker color										
+									}
+								}
+							}
+						}
+					}
+					
+					@Override
+					public void mouseExited(MouseEvent e) {
+						if(game.isToBeInserted()) {
+							onBoardUpdate();//Repaint the board unpainting the previsualization of the insertion
+						}
+					}
+				});
 				
 				//Adding the button to the panel
 				this.add(boardBoxes[i][j]);
@@ -80,6 +117,21 @@ public class BoardGrid extends JPanel implements GameObserver, ToolBarObserver {
 				else {
 					if(boardBoxes[i][j].getBackground() != deadColor) {//Only act if it is necessary (to prevent lag)
 						boardBoxes[i][j].setBackground(deadColor);
+					}
+				}
+				
+				if(game.getSelectionState() == 2) {
+					if(i == game.getX1() && j == game.getY1()) {
+						boardBoxes[i][j].setBackground(boardBoxes[i][j].getBackground().darker());
+					}
+				}
+				else if(game.getSelectionState() == 3) {
+					int x1 = game.getX1();
+					int y1 = game.getY1();
+					int x2 = game.getX2();
+					int y2 = game.getY2();
+					if(i >= Math.min(x1, x2) && i <= Math.max(x1, x2) && j >= Math.min(y1,  y2) && j <= Math.max(y1,  y2)) {
+						boardBoxes[i][j].setBackground(boardBoxes[i][j].getBackground().darker());						
 					}
 				}
 			}
