@@ -21,4 +21,4 @@ Having stated the general porpuse of this project, any other idea (mainly more s
 - Replacing delay by speed -> done
 - Load patterns from files -> done
 - Making the board a torus (geometric topology) (easy) -> done
-- Personalise option for the size of the board
+- Personalise option for the size of the board -> Ya va siendo HORA!!!!

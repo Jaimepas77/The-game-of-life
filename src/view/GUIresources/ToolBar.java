@@ -131,7 +131,7 @@ public class ToolBar extends JToolBar implements GameObserver {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser chooser = new JFileChooser();
-				FileNameExtensionFilter filter = new FileNameExtensionFilter("Game of life files", "rle", "txt");
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("Game of life files", "rle");
 				chooser.setFileFilter(filter);
 				int returnVal = chooser.showOpenDialog(load);
 				if(returnVal == JFileChooser.APPROVE_OPTION) {
@@ -313,7 +313,6 @@ public class ToolBar extends JToolBar implements GameObserver {
 			playPause.setText(pauseLabel);
 			step.setEnabled(false);
 			clear.setEnabled(false);
-			speedSlider.setEnabled(false);
 			load.setEnabled(false);
 			selectionMode.setEnabled(false);
 
