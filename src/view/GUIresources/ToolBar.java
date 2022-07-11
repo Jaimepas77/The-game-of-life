@@ -8,6 +8,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.FileNotFoundException;
 import java.nio.file.FileAlreadyExistsException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -30,8 +31,9 @@ public class ToolBar extends JToolBar implements GameObserver {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final double MIN_SPEED = 0.25;
-	private static final double MAX_SPEED = 4;
+	private static final double MIN_SPEED = 0.5;
+	private static final double MAX_SPEED = 10;
+	private static final double SPEED_EXP = 3;//Speed exponentiation in the slider
 	private static final Color DEFAULT_COLOR = new Color(255, 255, 230);
 
 	private Game game;
@@ -166,7 +168,7 @@ public class ToolBar extends JToolBar implements GameObserver {
 
 	private void initSpeedSetter() {
 		this.add(speedLabel);
-		speedSlider = new JSlider(SwingConstants.HORIZONTAL, (int) (MIN_SPEED*100), (int) (MAX_SPEED*100), (int) (game.getSpeed()*100));
+		speedSlider = new JSlider(SwingConstants.HORIZONTAL, (int) (Math.pow(MIN_SPEED, 1/SPEED_EXP)*100), (int) (Math.pow(MAX_SPEED, 1/SPEED_EXP)*100), (int) (game.getSpeed()*100));
 		speedSlider.setToolTipText("x" + game.getSpeed());
 
 		speedSlider.setBackground(DEFAULT_COLOR);
@@ -178,11 +180,16 @@ public class ToolBar extends JToolBar implements GameObserver {
 			@Override
 			public void stateChanged(ChangeEvent e) {
 
-				Runnable myRunnable =
-						new Runnable(){
+				Runnable myRunnable = new Runnable(){
 					public void run(){
-						game.setSpeed((double)speedSlider.getValue()/100);
-						speedSlider.setToolTipText("x" + game.getSpeed());
+						// exponential scale for speed values
+						double result = (double)speedSlider.getValue() / 100;
+						result = Math.pow(result, SPEED_EXP);
+						
+						game.setSpeed(result);
+						
+						String actSpeed = new DecimalFormat("#.##").format(game.getSpeed());//Format the double with two decimal values
+						speedSlider.setToolTipText("x" + actSpeed);
 					}
 				};
 
@@ -313,7 +320,7 @@ public class ToolBar extends JToolBar implements GameObserver {
 			playPause.setText(pauseLabel);
 			step.setEnabled(false);
 			clear.setEnabled(false);
-			speedSlider.setEnabled(false);
+//			speedSlider.setEnabled(false);
 			load.setEnabled(false);
 			selectionMode.setEnabled(false);
 

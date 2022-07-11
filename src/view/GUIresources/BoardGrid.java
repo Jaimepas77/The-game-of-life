@@ -58,14 +58,11 @@ public class BoardGrid extends JPanel implements GameObserver, ToolBarObserver {
 						else if(game.getSelectionState() == 2) {
 							game.selectSecond(x, y);
 						}
-						else if(game.getSelectionState() == 3) {
+						else if(game.getSelectionState() == 3 || game.isToBeInserted()) {
 							game.insertToBeInserted(x, y);//In fact, copy the selected area to the clicked place
 						}
-						else if(!game.isToBeInserted()) {
-							game.setSquareState(!game.getSquareState(x, y), x, y);//Invert squares state
-						}
 						else {
-							game.insertToBeInserted(x, y);
+							game.setSquareState(!game.getSquareState(x, y), x, y);//Invert squares state
 						}
 					}
 				}
@@ -130,7 +127,7 @@ public class BoardGrid extends JPanel implements GameObserver, ToolBarObserver {
 					int y1 = game.getY1();
 					int x2 = game.getX2();
 					int y2 = game.getY2();
-					if(i >= Math.min(x1, x2) && i <= Math.max(x1, x2) && j >= Math.min(y1,  y2) && j <= Math.max(y1,  y2)) {
+					if(i >= Math.min(x1, x2) && i <= Math.max(x1, x2) && j >= Math.min(y1,  y2) && j <= Math.max(y1,  y2)) {//If this square is in the range of the selected values ...
 						boardBoxes[i][j].setBackground(boardBoxes[i][j].getBackground().darker());						
 					}
 				}

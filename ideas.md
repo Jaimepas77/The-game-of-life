@@ -12,7 +12,7 @@ Having stated the general porpuse of this project, any other idea (mainly more s
 
 - Doing an UML diagram for general planning -> NO
 - Game mode to select a certain area of the board. After this, you may be able to save it in a file or move it to another part of the board. -> done
-- Speed variations (enable an extreme speed slider with a button or smth like that)
+- Speed variations (enable an extreme speed slider with a button or smth like that) -> exponential slider
 
 ## Implementation ideas
 
