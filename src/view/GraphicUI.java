@@ -32,6 +32,7 @@ public class GraphicUI extends JFrame implements Viewer{
 
 		//Board (CENTER)
 		BoardGrid board = new BoardGrid(game);
+		// BoardUI board = new BoardUI(game);
 		this.add(board, BorderLayout.CENTER);
 		tools.addObserver(board);
 
