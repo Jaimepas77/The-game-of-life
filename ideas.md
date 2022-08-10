@@ -22,4 +22,4 @@ Having stated the general porpuse of this project, any other idea (mainly more s
 - Load patterns from files -> done
 - Making the board a torus (geometric topology) (easy) -> done
 - Personalise option for the size of the board
-- Use a graphic rendered component instead of a grid of buttons to represent the board 
+- Use a graphic rendered component instead of a grid of buttons to represent the board -> done
