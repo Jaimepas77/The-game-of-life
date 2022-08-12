@@ -32,24 +32,35 @@ public class BoardUI extends JPanel implements GameObserver, ToolBarObserver {
     private void initBoard() {
         // Here all the listeners should be added
         addMouseListener(new MouseAdapter() {
+            @Override
             public void mousePressed(MouseEvent e) {
                 int x = (int) resizeCoord(e.getX(), getWidth(), numCols);
                 int y = (int) resizeCoord(e.getY(), getHeight(), numRows);
                 clickCell(y, x);
             }
 
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                int x = (int) resizeCoord(e.getX(), getWidth(), numCols);
+                int y = (int) resizeCoord(e.getY(), getHeight(), numRows);
+                releaseCell(y, x);
+            }
+
+            @Override
             public void mouseExited(MouseEvent e) {
                 overCell(-1, -1);
             }
         });
 
         addMouseMotionListener(new MouseAdapter() {
+            @Override
             public void mouseMoved(MouseEvent e) {
                 int x = (int) resizeCoord(e.getX(), getWidth(), numCols);
                 int y = (int) resizeCoord(e.getY(), getHeight(), numRows);
                 overCell(y, x);
             }
 
+            @Override
             public void mouseDragged(MouseEvent e) {
                 int x = (int) resizeCoord(e.getX(), getWidth(), numCols);
                 int y = (int) resizeCoord(e.getY(), getHeight(), numRows);
@@ -64,7 +75,7 @@ public class BoardUI extends JPanel implements GameObserver, ToolBarObserver {
     }
 
     private void clickCell(int row, int col) {
-        if (enableClick) {//Only do smth when the board click is enabled
+        if (enableClick) {// Only do smth when the board click is enabled
             if (game.getSelectionState() == 1) {
                 game.selectFirst(row, col);
             } else if (game.getSelectionState() == 2) {
@@ -77,10 +88,16 @@ public class BoardUI extends JPanel implements GameObserver, ToolBarObserver {
         }
     }
 
-private void overCell(int row, int col) {
+    private void releaseCell(int row, int col) {
+        if(game.getSelectionState() == 2) {
+            game.selectSecond(row, col);
+        }
+    }
+
+    private void overCell(int row, int col) {
         mouseX = col;
         mouseY = row;
-        if (enableClick) {//Only paint the mouse pos when you can do smth with it
+        if (enableClick) {// Only paint the mouse pos when you can do smth with it
             repaint();
         }
     }
@@ -108,7 +125,12 @@ private void overCell(int row, int col) {
                 }
 
                 if (game.getSelectionState() == 2) {
-                    if (i == game.getX1() && j == game.getY1()) {
+                    int x1 = game.getX1();//Row
+                    int y1 = game.getY1();//Col
+                    int x2 = mouseY;//Row
+                    int y2 = mouseX;//Col
+                    if (i >= Math.min(x1, x2) && i <= Math.max(x1, x2) && j >= Math.min(y1, y2)
+                            && j <= Math.max(y1, y2)) {// If this square is in the range of the potentially selected values ...
                         g.setColor(g.getColor().darker());
                     }
                 } else if (game.getSelectionState() == 3) {

@@ -23,5 +23,5 @@ Having stated the general porpuse of this project, any other idea (mainly more s
 - Making the board a torus (geometric topology) (easy) -> done
 - Personalise option for the size of the board
 - Use a graphic rendered component instead of a grid of buttons to represent the board -> done
-- Replace the selection mode with a drag to select functionality or implement the selection mode in a way that you can drag to select when enabled
+- ~~Replace the selection mode with a drag to select functionality or~~ implement the selection mode in a way that you can drag to select when enabled -> done
 - Add a help button to see a description of every functionality
