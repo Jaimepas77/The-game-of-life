@@ -40,9 +40,14 @@ public class BoardUI extends JPanel implements GameObserver, ToolBarObserver {
             }
 
             @Override
-            public void mouseReleased(MouseEvent e) {
+            public void mouseReleased(MouseEvent e) {// Warning: the mouse can be released out of the panel
                 int x = (int) resizeCoord(e.getX(), getWidth(), numCols);
+                x = Math.max(x, 0);
+                x = Math.min(x, numCols - 1);
                 int y = (int) resizeCoord(e.getY(), getHeight(), numRows);
+                y = Math.max(y, 0);
+                y = Math.min(y, numRows - 1);
+
                 releaseCell(y, x);
             }
 
@@ -61,9 +66,14 @@ public class BoardUI extends JPanel implements GameObserver, ToolBarObserver {
             }
 
             @Override
-            public void mouseDragged(MouseEvent e) {
+            public void mouseDragged(MouseEvent e) {// Warning: the mouse can be dragged out of the panel
                 int x = (int) resizeCoord(e.getX(), getWidth(), numCols);
+                x = Math.max(x, 0);
+                x = Math.min(x, numCols - 1);
                 int y = (int) resizeCoord(e.getY(), getHeight(), numRows);
+                y = Math.max(y, 0);
+                y = Math.min(y, numRows - 1);
+
                 overCell(y, x);
             }
         });
@@ -89,7 +99,7 @@ public class BoardUI extends JPanel implements GameObserver, ToolBarObserver {
     }
 
     private void releaseCell(int row, int col) {
-        if(game.getSelectionState() == 2) {
+        if (game.getSelectionState() == 2) {
             game.selectSecond(row, col);
         }
     }
@@ -125,12 +135,13 @@ public class BoardUI extends JPanel implements GameObserver, ToolBarObserver {
                 }
 
                 if (game.getSelectionState() == 2) {
-                    int x1 = game.getX1();//Row
-                    int y1 = game.getY1();//Col
-                    int x2 = mouseY;//Row
-                    int y2 = mouseX;//Col
+                    int x1 = game.getX1();// Row
+                    int y1 = game.getY1();// Col
+                    int x2 = mouseY;// Row
+                    int y2 = mouseX;// Col
                     if (i >= Math.min(x1, x2) && i <= Math.max(x1, x2) && j >= Math.min(y1, y2)
-                            && j <= Math.max(y1, y2)) {// If this square is in the range of the potentially selected values ...
+                            && j <= Math.max(y1, y2)) {// If this square is in the range of the potentially selected
+                                                       // values ...
                         g.setColor(g.getColor().darker());
                     }
                 } else if (game.getSelectionState() == 3) {
@@ -150,9 +161,9 @@ public class BoardUI extends JPanel implements GameObserver, ToolBarObserver {
                     if (tmp.length > i - mouseY && tmp[0].length > j - mouseX) {
                         // Paint the structure in a darker color
                         if (tmp[i - mouseY][j - mouseX]) {
-                            g.setColor(aliveColor.darker());
+                            g.setColor(aliveColor.darker().darker());
                         } else {
-                            g.setColor(deadColor.darker());
+                            g.setColor(deadColor.darker().darker());
                         }
                     }
                 }

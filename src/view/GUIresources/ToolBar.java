@@ -104,7 +104,7 @@ public class ToolBar extends JToolBar implements GameObserver {
 
 	private void initSelectionMode() {
 		selectionMode = new JToggleButton("Selection mode", false);
-		selectionMode.setToolTipText("Enable a mode where you can select a certain area of the board by clicking in two places of it");
+		selectionMode.setToolTipText("Enable a mode where you can select a certain area of the board");
 		this.add(selectionMode);
 
 		selectionMode.addItemListener(new ItemListener() {
