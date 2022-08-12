@@ -32,25 +32,28 @@ public class BoardUI extends JPanel implements GameObserver, ToolBarObserver {
         // Here all the listeners should be added
         addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
-                int x = e.getX() / (getWidth() / numCols);
-                int y = e.getY() / (getHeight() / numRows);
+                int x = (int) resizeCoord(e.getX(), getWidth(), numCols);
+                int y = (int) resizeCoord(e.getY(), getHeight(), numRows);
                 clickCell(y, x);
             }
 
             public void mouseExited(MouseEvent e) {
-                mouseX = mouseY = -1;
-                repaint();
+                overCell(-1, -1);
             }
         });
 
         addMouseMotionListener(new MouseAdapter() {
             public void mouseMoved(MouseEvent e) {
-                int x = e.getX() / (getWidth() / numCols);
-                int y = e.getY() / (getHeight() / numRows);
+                int x = (int) resizeCoord(e.getX(), getWidth(), numCols);
+                int y = (int) resizeCoord(e.getY(), getHeight(), numRows);
                 overCell(y, x);
-                repaint();
             }
         });
+    }
+
+    private float resizeCoord(float x, float maxX, float newMaxX) {//Resize coordinates without losing precision
+        float newX = x/maxX * newMaxX;
+        return newX;
     }
 
     private void clickCell(int row, int col) {
@@ -65,9 +68,10 @@ public class BoardUI extends JPanel implements GameObserver, ToolBarObserver {
         }
     }
 
-    private void overCell(int y, int x) {
-        mouseX = x;
-        mouseY = y;
+    private void overCell(int row, int col) {
+        mouseX = col;
+        mouseY = row;
+        repaint();
     }
 
     protected void paintComponent(Graphics g) {
@@ -80,10 +84,10 @@ public class BoardUI extends JPanel implements GameObserver, ToolBarObserver {
         for (int i = 0; i < numRows; i++) {
             for (int j = 0; j < numCols; j++) {
                 // Properties of the square to be painted
-                int x = w / numCols * j;
-                int y = h / numRows * i;
-                int width = w / numCols;
-                int height = h / numRows;
+                int x = (int) resizeCoord(j, numCols, w);
+                int y = (int) resizeCoord(i, numRows, h);
+                int width = (int) resizeCoord(j+1, numCols, w) - x;//The space between the next col and this one is the width
+                int height = (int) resizeCoord(i+1, numRows, h) - y;
 
                 if (board[i][j]) {
                     g.setColor(aliveColor);
@@ -132,7 +136,6 @@ public class BoardUI extends JPanel implements GameObserver, ToolBarObserver {
                 }
             }
         }
-        // g.fillRect(w-15, h-15, 10, 10);//See the corner
     }
 
     @Override
