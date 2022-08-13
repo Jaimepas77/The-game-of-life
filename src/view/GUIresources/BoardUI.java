@@ -82,12 +82,12 @@ public class BoardUI extends JPanel implements GameObserver, ToolBarObserver {
         addMouseWheelListener(new MouseWheelListener() {
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
-                System.out.println("Wheel: " + e.getWheelRotation());
+                // System.out.println("Wheel: " + e.getWheelRotation());
                 int movements = e.getWheelRotation();
                 for (int i = 0; i < Math.abs(movements); i++) {
-                    // Wheel down -> clockwise
-                    // Wheel up -> counterclockwise rotation
-                    rotate(movements > 0);
+                    // Wheel down -> counterclockwise rotation
+                    // Wheel up -> clockwise
+                    rotate(movements < 0);
                 }
             }
         });

@@ -162,24 +162,24 @@ public class Game {
 	}
 
 	public void rotateToBeInserted(boolean clockwise) {
-		/*
-		 * // Copy the area to the to be inserted variable
-		 * boolean[][] tmp = new boolean[toBeInserted[0].length][toBeInserted.length];
-		 * for (int i = 0; i < toBeInserted.length; i++) {
-		 * for (int j = 0; j < toBeInserted[0].length; j++) {
-		 * // TODO
-		 * if (clockwise) {
-		 * 
-		 * } else {
-		 * 
-		 * }
-		 * }
-		 * }
-		 * 
-		 * toBeInserted = tmp;
-		 */
 
-		updateBoard();
+		if (isToBeInserted()) {
+			// Copy the area to the to be inserted variable
+			boolean[][] tmp = new boolean[toBeInserted[0].length][toBeInserted.length];
+			for (int i = 0; i < toBeInserted.length; i++) {
+				for (int j = 0; j < toBeInserted[0].length; j++) {
+					if (clockwise) {
+						tmp[j][i] = toBeInserted[toBeInserted.length - 1 - i][j];
+					} else {
+						tmp[j][i] = toBeInserted[i][toBeInserted[0].length - 1 - j];
+					}
+				}
+			}
+
+			toBeInserted = tmp;
+
+			updateBoard();
+		}
 	}
 
 	public void insertToBeInserted(int x, int y) {
