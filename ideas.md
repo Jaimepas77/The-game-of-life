@@ -25,3 +25,5 @@ Having stated the general porpuse of this project, any other idea (mainly more s
 - Use a graphic rendered component instead of a grid of buttons to represent the board -> done
 - ~~Replace the selection mode with a drag to select functionality or~~ implement the selection mode in a way that you can drag to select when enabled -> done
 - Add a help button to see a description of every functionality
+- Add the ability to rotate the pieces to be inserted with the wheel of the mouse
+- Disable the posibility of clicking with the right button or wheel button of the mouse for normal actions

@@ -6,8 +6,7 @@ import java.awt.Color;
 import model.Game;
 import model.GameObserver;
 import java.awt.Graphics;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseAdapter;
+import java.awt.event.*;
 
 public class BoardUI extends JPanel implements GameObserver, ToolBarObserver {
 
@@ -36,7 +35,9 @@ public class BoardUI extends JPanel implements GameObserver, ToolBarObserver {
             public void mousePressed(MouseEvent e) {
                 int x = (int) resizeCoord(e.getX(), getWidth(), numCols);
                 int y = (int) resizeCoord(e.getY(), getHeight(), numRows);
-                clickCell(y, x);
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    clickCell(y, x);
+                }
             }
 
             @Override
@@ -77,6 +78,23 @@ public class BoardUI extends JPanel implements GameObserver, ToolBarObserver {
                 overCell(y, x);
             }
         });
+
+        addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                System.out.println("Wheel: " + e.getWheelRotation());
+                int movements = e.getWheelRotation();
+                for (int i = 0; i < Math.abs(movements); i++) {
+                    // Wheel down -> clockwise
+                    // Wheel up -> counterclockwise rotation
+                    rotate(movements > 0);
+                }
+            }
+        });
+    }
+
+    private void rotate(boolean clockwise) {
+        game.rotateToBeInserted(clockwise);
     }
 
     private float resizeCoord(float x, float maxX, float newMaxX) {// Resize coordinates without losing precision
