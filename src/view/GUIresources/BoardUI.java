@@ -3,12 +3,15 @@ package view.GUIresources;
 import javax.swing.JPanel;
 
 import java.awt.Color;
+import java.awt.Cursor;
+
 import model.Game;
 import model.GameObserver;
 import java.awt.Graphics;
 import java.awt.event.*;
 
 public class BoardUI extends JPanel implements GameObserver, ToolBarObserver {
+    public final Cursor editCursor = new Cursor(Cursor.CROSSHAIR_CURSOR);// The cursor used in the selection mode
 
     private Game game;
     private int numRows;
@@ -127,6 +130,13 @@ public class BoardUI extends JPanel implements GameObserver, ToolBarObserver {
         mouseY = row;
         if (enableClick) {// Only paint the mouse pos when you can do smth with it
             repaint();
+        }
+
+        int state = game.getSelectionState();// 1 and 2 are selecting the first square and the second respectively
+        if ((state == 1 || state == 2) && col != -1 && row != -1 && this.getCursor() != editCursor) {
+            this.setCursor(editCursor);
+        } else {
+            this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
     }
 

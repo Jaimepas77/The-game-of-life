@@ -13,6 +13,7 @@ Having stated the general porpuse of this project, any other idea (mainly more s
 - Doing an UML diagram for general planning -> NO
 - Game mode to select a certain area of the board. After this, you may be able to save it in a file or move it to another part of the board. -> done
 - Speed variations (enable an extreme speed slider with a button or smth like that) -> exponential slider
+- Documenting the java functions with the @ built in functionality
 
 ## Implementation ideas
 
@@ -27,3 +28,5 @@ Having stated the general porpuse of this project, any other idea (mainly more s
 - Add a help button to see a description of every functionality
 - Add the ability to rotate the pieces to be inserted with the wheel of the mouse -> done
 - Disable the posibility of clicking with the right button or wheel button of the mouse for normal actions
+- Add a check box to disable or enable the grid borders.
+- Change the colors slightly when the selection mode is activated. Also change the mouse cursor (already done this last part).
