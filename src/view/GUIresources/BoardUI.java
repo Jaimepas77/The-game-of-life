@@ -1,17 +1,20 @@
 package view.GUIresources;
 
-import javax.swing.JPanel;
-
-import java.awt.Color;
-import java.awt.Cursor;
-
 import model.Game;
 import model.GameObserver;
+
+import javax.swing.JPanel;
+import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics;
+import java.awt.Toolkit;
+import java.awt.Point;
+import java.awt.Image;
 import java.awt.event.*;
 
 public class BoardUI extends JPanel implements GameObserver, ToolBarObserver {
-    public final Cursor editCursor = new Cursor(Cursor.CROSSHAIR_CURSOR);// The cursor used in the selection mode
+    private Cursor editCursor = new Cursor(Cursor.CROSSHAIR_CURSOR);// The cursor used in the selection mode
+    private Cursor dragCursor;// The cursor used when pasting a copied item
 
     private Game game;
     private int numRows;
@@ -27,6 +30,10 @@ public class BoardUI extends JPanel implements GameObserver, ToolBarObserver {
         numRows = game.getRows();
         numCols = game.getColumns();
         game.addObserver(this);
+
+        Toolkit tkit = Toolkit.getDefaultToolkit();
+        Image dragImg = tkit.getImage("resources/drag.png");
+        dragCursor = tkit.createCustomCursor(dragImg, new Point(15, 15), "drag");
 
         initBoard();
     }
@@ -53,6 +60,7 @@ public class BoardUI extends JPanel implements GameObserver, ToolBarObserver {
                 y = Math.min(y, numRows - 1);
 
                 releaseCell(y, x);
+                overCell(y, x);
             }
 
             @Override
@@ -133,8 +141,14 @@ public class BoardUI extends JPanel implements GameObserver, ToolBarObserver {
         }
 
         int state = game.getSelectionState();// 1 and 2 are selecting the first square and the second respectively
-        if ((state == 1 || state == 2) && col != -1 && row != -1 && this.getCursor() != editCursor) {
-            this.setCursor(editCursor);
+        if ((state == 1 || state == 2) && col != -1 && row != -1) {
+            if (this.getCursor() != editCursor) {
+                this.setCursor(editCursor);
+            }
+        } else if (state == 3) {
+            if (this.getCursor() != dragCursor) {
+                this.setCursor(dragCursor);
+            }
         } else {
             this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
